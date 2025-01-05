@@ -18,29 +18,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Passo 2: Instalar Minikube
-      - name: Install Minikube
-        run: |
-          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-          sudo chmod +x minikube
-          sudo mv minikube /usr/local/bin/
-
-      # Passo 3: Iniciar Minikube (cluster local)
-      - name: Start Minikube
-        run: |
-          minikube start --driver=docker
-
-      # Passo 4: Instalar o kubectl
-      - name: Install kubectl
-        run: |
-          curl -LO "https://dl.k8s.io/release/v1.23.5/bin/linux/amd64/kubectl"
-          sudo chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
-
-      # Passo 5: Configurar kubectl para usar Minikube
-      - name: Set kubectl context for Minikube
-        run: |
-          kubectl config use-context minikube
+      - name: Iniciar Minikube
+        uses: medyagh/setup-minikube@master
 
       # 2. Login no Docker Hub
       - name: Login to Docker Hub
@@ -67,36 +46,15 @@ jobs:
           cd hello-world-api
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}
+          
+      - name: Aplicar Namespace
+        run: kubectl apply -f k8s/namespace.yaml
 
-      - name: Download and setup ngrok
-        run: |
-          curl -s https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip -o ngrok.zip
-          unzip ngrok.zip
-          sudo mv ngrok /usr/local/bin/
+      - name: Aplicar Deployment
+        run: kubectl apply -f k8s/deployment.yaml
 
-      - name: Expose Minikube using ngrok
-        run: |
-          nohup ngrok http 8443 &
-          sleep 10 
+      - name: Aplicar Service
+        run: kubectl apply -f k8s/service.yaml
 
-      # Passo 10: Configurar kubectl para acessar Minikube via ngrok
-      - name: Set kubectl context for Minikube through ngrok
-        run: |
-          kubectl config set-cluster minikube --server=http://192.168.49.2:8443 --insecure-skip-tls-verify=true
-          kubectl config use-context minikube
-
-      # Passo 11: Atualizar a imagem do deployment com kubectl set image
-      - name: Set image for Kubernetes deployment
-        run: |
-          kubectl get pods -n devops-challenge
-          kubectl set image deployment/hello-world-api hello-world-container=${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} -n devops-challenge
-
-      # Passo 12: Verificar o status do deployment
-      - name: Verify Kubernetes deployment
-        run: |
-          kubectl rollout status deployment/hello-world-api -n devops-challenge
-
-      # Passo 13: Verificar os pods
-      - name: Check if pods are running
-        run: |
-          kubectl get pods -n devops-challenge
+      - name: Verificar Deployment
+        run: kubectl get all -n devops-challenge
