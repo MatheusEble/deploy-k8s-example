@@ -61,4 +61,4 @@ jobs:
 
       - name: Exibir URL da Aplicação
         run: |
-          minikube service app-service -n devops-challenge --url
+          minikube service hello-world-api -n devops-challenge --url
