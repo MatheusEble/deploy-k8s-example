@@ -57,10 +57,11 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}
 
-      # Passo 6: Atualizar a imagem do Deployment com kubectl set image
-      - name: Update Kubernetes deployment image
+      - name: Apply Kubernetes YAML files
         run: |
-          kubectl set image deployment/hello-world-api hello-world-container=${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} -n devops-challenge
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
 
       # Passo 7: Verificar o status do rollout do deployment
       - name: Verify Kubernetes deployment
