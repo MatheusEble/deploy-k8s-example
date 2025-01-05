@@ -45,7 +45,7 @@ jobs:
 
       - name: Replace image tag in deployment.yaml
         run: |
-          sed -i "s|IMAGE_TAG_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}|g" deployment.yaml
+          sed -i "s|IMAGE_TAG_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}|g" hello-world-api/k8s/deployment.yaml
 
       # Passo 5: Aplicar arquivos Kubernetes para deploy no cluster
       - name: Set up kubectl
