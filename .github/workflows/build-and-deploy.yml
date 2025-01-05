@@ -47,6 +47,10 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}
 
+      - name: Configurar kubectl
+        run: |
+          kubectl config use-context minikube
+
       - name: Aplicar Namespace
         run: kubectl apply -f k8s/namespace.yaml
 
@@ -56,9 +60,6 @@ jobs:
       - name: Aplicar Service
         run: kubectl apply -f k8s/service.yaml
 
-      - name: Verificar Deployment
-        run: kubectl get all -n devops-challenge
-
-      - name: Exibir URL da Aplicação
+      - name: Atualizar Imagem do Deployment
         run: |
-          minikube service hello-world-api -n devops-challenge --url
+          kubectl set image deployment/hello-world-api hello-world-api=${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} -n devops-challeng
