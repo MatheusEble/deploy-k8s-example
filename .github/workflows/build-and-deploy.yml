@@ -82,7 +82,7 @@ jobs:
       # Passo 10: Configurar kubectl para acessar Minikube via ngrok
       - name: Set kubectl context for Minikube through ngrok
         run: |
-          kubectl config set-cluster minikube --server=https://192.168.49.2:30080 --insecure-skip-tls-verify=true
+          kubectl config set-cluster minikube --server=http://192.168.49.2:30080 --insecure-skip-tls-verify=true
           kubectl config use-context minikube
 
       # Passo 11: Atualizar a imagem do deployment com kubectl set image
