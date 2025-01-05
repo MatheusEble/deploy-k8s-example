@@ -24,7 +24,7 @@ jobs:
           curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
           sudo chmod +x minikube
           sudo mv minikube /usr/local/bin/
-          apt-get install -y unzip
+          sudo apt-get install -y unzip
 
       # Passo 3: Iniciar Minikube (cluster local)
       - name: Start Minikube
