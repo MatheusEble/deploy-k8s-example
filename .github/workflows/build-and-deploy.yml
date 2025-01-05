@@ -18,6 +18,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Instalar Minikube
+        run: |
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          chmod +x minikube
+          sudo mv minikube /usr/local/bin/
+          minikube start --driver=docker
+          minikube status
+
+      - name: Configurar kubectl para Minikube
+        run: |
+          sudo apt-get install -y kubectl
+          kubectl config use-context minikube
+
       # 2. Login no Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -39,6 +52,7 @@ jobs:
       # 4. Build da imagem Docker
       - name: Build and Push Docker image
         run: |
+          eval $(minikube docker-env)
           cd hello-world-api
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}
