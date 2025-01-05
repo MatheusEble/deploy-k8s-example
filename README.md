@@ -56,14 +56,12 @@ A aplicação é implantada em um cluster Kubernetes local gerenciado pelo **Min
 
 ---
 
----
-
 ## 🚦 **Como rodar a pipeline de build e deploy?**
 
 **A pipeline irá rodar automaticamente ao abrir pull requests ou merges na branch principal.**
 
 ---
----
+
 ## 🐳 **Docker**
 
 **Build e execução manual da imagem:**
@@ -155,7 +153,5 @@ minikube start --driver=docker
 ```bash
 minikube service hello-world-api-service -n devops-challenge
 ```
-
----
 
 ---
