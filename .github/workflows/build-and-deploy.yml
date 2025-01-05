@@ -62,4 +62,4 @@ jobs:
 
       - name: Atualizar Imagem do Deployment
         run: |
-          kubectl set image deployment/hello-world-api hello-world-api=${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} -n devops-challeng
+          kubectl set image deployment/hello-world-api hello-world-api=${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} -n devops-challenge
