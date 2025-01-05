@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  build-and-push:
-    name: Build and Push Docker Image
+  build-and-push-and-deploy:
+    name: Build/Push image Docker and Deploy k8s
     runs-on: ubuntu-latest
 
     steps:
@@ -76,18 +76,19 @@ jobs:
 
       - name: Expose Minikube using ngrok
         run: |
-          nohup ngrok http 30080 &
+          nohup ngrok http 8443 &
           sleep 10 
 
       # Passo 10: Configurar kubectl para acessar Minikube via ngrok
       - name: Set kubectl context for Minikube through ngrok
         run: |
-          kubectl config set-cluster minikube --server=http://192.168.49.2:30080 --insecure-skip-tls-verify=true
+          kubectl config set-cluster minikube --server=http://192.168.49.2:8443 --insecure-skip-tls-verify=true
           kubectl config use-context minikube
 
       # Passo 11: Atualizar a imagem do deployment com kubectl set image
       - name: Set image for Kubernetes deployment
         run: |
+          kubectl get pods -n devops-challenge
           kubectl set image deployment/hello-world-api hello-world-container=${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} -n devops-challenge
 
       # Passo 12: Verificar o status do deployment
