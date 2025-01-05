@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: hello-world-api
-          image: IMAGE_TAG_PLACEHOLDER
+          image: ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}
           ports:
             - containerPort: 3000

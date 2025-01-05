@@ -43,21 +43,21 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} .
           docker push ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}
 
-      - name: Replace image tag in deployment.yaml
-        run: |
-          sed -i "s|IMAGE_TAG_PLACEHOLDER|${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}|g" hello-world-api/k8s/deployment.yaml
-
       # Passo 5: Aplicar arquivos Kubernetes para deploy no cluster
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
 
-      - name: Deploy to Kubernetes
+      # Passo 6: Atualizar a imagem do Deployment com kubectl set image
+      - name: Update Kubernetes deployment image
         run: |
-          kubectl apply -f hello-world-api/k8s/namespace.yaml
-          kubectl apply -f hello-world-api/k8s/deployment.yaml
-          kubectl apply -f hello-world-api/k8s/service.yaml
+          kubectl set image deployment/hello-world-api hello-world-container=${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} -n devops-challenge
 
-      # Passo 6: Verificar se os pods estão funcionando
+      # Passo 7: Verificar o status do rollout do deployment
       - name: Verify Kubernetes deployment
+        run: |
+          kubectl rollout status deployment/hello-world-api -n devops-challenge
+
+      # Passo 8: Verificar se os pods estão funcionando
+      - name: Verify Pods
         run: |
           kubectl get pods -n devops-challenge
