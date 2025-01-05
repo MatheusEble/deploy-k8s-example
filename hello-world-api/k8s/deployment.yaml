@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: hello-world-api
-          image: ebleman/hello-world-api:2025.01.05-a26c4ad
+          image: IMAGE_TAG_PLACEHOLDER
           ports:
             - containerPort: 3000
