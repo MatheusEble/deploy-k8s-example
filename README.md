@@ -32,7 +32,7 @@ A aplicação é implantada em um cluster Kubernetes local gerenciado pelo **Min
 ```
 ├── .github/
 │   └── workflows/
-│       └── build-and-deploy.yaml   # Pipeline do GitHub Actions
+│       └── build-and-deploy.yml   # Pipeline do GitHub Actions
 ├── k8s/
 │   ├── deployment.yaml             # Configuração do Deployment
 │   ├── service.yaml                # Configuração do Service
