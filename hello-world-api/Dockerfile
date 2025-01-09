@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-FROM node:20 AS runtime
+FROM node:20-alpine AS runtime
 
 WORKDIR /app
 
