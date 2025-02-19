@@ -1,0 +1,51 @@
+name: Auto Release Tag
+
+on:
+  schedule:
+    - cron: "15 13 * * 1-4" # 10:15 BRT (Brasil) = 13:15 UTC, de segunda a quinta
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Garante que pegamos todas as tags
+
+      - name: Verifica a última tag
+        id: last_tag
+        run: echo "tag=$(git describe --tags --abbrev=0 || echo '0.00.00')" >> $GITHUB_ENV
+
+      - name: Incrementa versão da tag
+        id: versioning
+        run: |
+          last_tag=${{ env.tag }}
+          echo "Última tag: $last_tag"
+          
+          IFS='.' read -r -a parts <<< "$last_tag"
+          major=${parts[0]}
+          minor=${parts[1]}
+          patch=${parts[2]}
+
+          # Verificar se o patch está abaixo de 99
+          if [[ $patch -lt 99 ]]; then
+            patch=$((patch + 1)) # Incrementa o patch
+          else
+            patch="00"  # Reseta o patch para 00
+            minor=$((minor + 10)) # Incrementa o minor de 10 em 10
+          fi
+
+          new_tag="$major.$minor.$patch"
+          echo "new_tag=$new_tag" >> $GITHUB_ENV
+          echo "Nova versão: $new_tag"
+
+      - name: Criar nova tag e release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git tag ${{ env.new_tag }}
+          git push origin ${{ env.new_tag }}
+          gh release create ${{ env.new_tag }} --title "Release ${{ env.new_tag }}" --notes "Release automática gerada pelo GitHub Actions."
