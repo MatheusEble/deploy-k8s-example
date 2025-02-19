@@ -31,9 +31,11 @@ jobs:
           if [[ $patch -lt 99 ]]; then
             patch=$((patch + 1))
           else
-            patch="01"  # Reinicia o patch em 01
+            patch=1  # Reinicia o patch em 01
             minor=$((minor + 1))  # Incrementa o minor
           fi
+
+          patch=$(printf "%02d" "$patch")  # Formata para dois dígitos
 
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
