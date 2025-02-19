@@ -15,32 +15,30 @@ jobs:
         with:
           fetch-depth: 0 # Garante que pegamos todas as tags
 
-      - name: Verifica a última tag
-        id: last_tag
-        run: echo "tag=$(git describe --tags --abbrev=0 || echo '0.00.00')" >> $GITHUB_ENV
-
-      - name: Incrementa versão da tag
-        id: versioning
+      - name: Obter a última tag
         run: |
-          last_tag=${{ env.tag }}
-          echo "Última tag: $last_tag"
-          
-          IFS='.' read -r -a parts <<< "$last_tag"
+          last_tag=$(git describe --tags --abbrev=0 || echo "0.00.00")
+          echo "Última tag encontrada: $last_tag"
+          echo "tag=$last_tag" >> $GITHUB_ENV
+
+      - name: Calcular nova versão
+        run: |
+          IFS='.' read -r -a parts <<< "$tag"
           major=${parts[0]}
           minor=${parts[1]}
           patch=${parts[2]}
 
-          # Verificar se o patch está abaixo de 99
           if [[ $patch -lt 99 ]]; then
-            patch=$((patch + 1)) # Incrementa o patch
+            patch=$((patch + 1))
           else
-            patch="00"  # Reseta o patch para 00
-            minor=$((minor + 10)) # Incrementa o minor de 10 em 10
+            patch="01"  # Reinicia o patch em 01
+            minor=$((minor + 1))  # Incrementa o minor
           fi
 
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
-          echo "Nova versão: $new_tag"
+          echo "Nova versão gerada: $new_tag"
+
 
       - name: Criar nova tag e release
         env:
