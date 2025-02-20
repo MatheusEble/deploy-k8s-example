@@ -47,5 +47,7 @@ jobs:
           git push origin ${{ env.new_tag }}
 
       - name: Criar release com notas automáticas
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release create ${{ env.new_tag }} --title "Release ${{ env.new_tag }}" --generate-notes
