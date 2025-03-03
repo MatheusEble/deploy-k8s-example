@@ -17,7 +17,10 @@ jobs:
 
       - name: Obter a última tag
         run: |
-          last_tag=$(git describe --tags --abbrev=0 || echo "0.00.00")
+          git fetch --tags  # Garante que pega as tags mais recentes do repositório
+          last_tag=$(git tag --sort=-v:refname | head -n 1)
+          last_tag=${last_tag:-"0.00.00"}  # Se não houver tags, usa "0.00.00"
+          
           echo "Última tag encontrada: $last_tag"
           echo "tag=$last_tag" >> $GITHUB_ENV
 
