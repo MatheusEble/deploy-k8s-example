@@ -2,7 +2,7 @@ name: Auto Release Tag
 
 on:
   schedule:
-    - cron: "33 13 * * 1-4" # 10:15 BRT (Brasil) = 13:15 UTC, de segunda a quinta
+    - cron: "5 13 * * 1-4" # 10:15 BRT (Brasil) = 13:15 UTC, de segunda a quinta
   workflow_dispatch: # Permite execução manual
 
 jobs:
@@ -25,17 +25,17 @@ jobs:
         run: |
           IFS='.' read -r -a parts <<< "$tag"
           major=${parts[0]}
-          minor=${parts[1]}
-          patch=${parts[2]}
+          minor=$((10#${parts[1]}))  # Força base decimal
+          patch=$((10#${parts[2]}))  # Força base decimal
 
           if [[ $patch -lt 99 ]]; then
             patch=$((patch + 1))
           else
-            patch=1
+            patch=01  # Mantém o formato correto
             minor=$((minor + 1))
           fi
 
-          patch=$(printf "%02d" "$patch")
+          patch=$(printf "%02d" "$patch")  # Garante dois dígitos no PATCH
 
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
