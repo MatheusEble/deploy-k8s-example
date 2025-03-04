@@ -31,8 +31,8 @@ jobs:
           minor=${parts[1]}
           patch=${parts[2]}
 
-          # Ignorar caracteres não numéricos no patch (extrair apenas a parte numérica)
-          patch_number=$(echo "$patch" | sed 's/[^0-9]*//g')
+          # Remover o prefixo 0 para evitar interpretação como octal
+          patch_number=$(echo "$patch" | sed 's/^0*//')  # Remove zeros à esquerda
 
           # Verifica se o valor de patch_number é numérico
           if ! [[ "$patch_number" =~ ^[0-9]+$ ]]; then
