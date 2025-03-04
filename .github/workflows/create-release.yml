@@ -31,28 +31,30 @@ jobs:
           minor=${parts[1]}
           patch=${parts[2]}
 
-          # Remover o prefixo 0 para evitar interpretação como octal
-          patch_number=$(echo "$patch" | sed 's/^0*//')  # Remove zeros à esquerda
+          # Remover qualquer caractere não numérico no patch (ex: transformar "12a" em "12")
+          patch_number=$(echo "$patch" | sed 's/[^0-9]//g')
 
-          # Verifica se o valor de patch_number é numérico
-          if ! [[ "$patch_number" =~ ^[0-9]+$ ]]; then
-            patch_number=0  # Se não for numérico, tratamos como 0
+          # Se o patch estiver vazio ou não for numérico, definir como 0
+          if [[ -z "$patch_number" || ! "$patch_number" =~ ^[0-9]+$ ]]; then
+            patch_number=0
           fi
 
-          # Lógica de incremento
+          # Incrementar o patch
           if [[ $patch_number -lt 99 ]]; then
             patch_number=$((patch_number + 1))
           else
-            patch_number=01  # Mantém o formato correto
-            minor=$((minor + 1))
+            patch_number=0
+            minor=$((minor + 1))  # Incrementa o minor quando o patch chega a 99
           fi
 
-          # Usar printf para garantir que o patch tenha dois dígitos
+          # Garantir que o patch tenha dois dígitos sempre
           patch=$(printf "%02d" "$patch_number")
 
+          # Gerar a nova versão
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
           echo "Nova versão gerada: $new_tag"
+
 
       - name: Criar nova tag
         run: |
