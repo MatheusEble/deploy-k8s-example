@@ -45,7 +45,6 @@ jobs:
           eval $(minikube docker-env)
           cd hello-world-api
           docker build -t ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/hello-world-api:${{ env.VERSION }}-${{ env.COMMIT_SHA }}
 
       - name: Configurar kubectl
         run: |
