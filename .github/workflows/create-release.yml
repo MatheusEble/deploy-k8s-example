@@ -31,8 +31,11 @@ jobs:
           minor=${parts[1]}
           patch=${parts[2]}
 
-          # Remover qualquer caractere não numérico no patch (ex: transformar "12a" em "12")
+          # Remover caracteres não numéricos do patch (ex: transformar "12a" em "12")
           patch_number=$(echo "$patch" | sed 's/[^0-9]//g')
+
+          # Remover zeros à esquerda para evitar problemas com base octal
+          patch_number=$((10#$patch_number))
 
           # Se o patch estiver vazio ou não for numérico, definir como 0
           if [[ -z "$patch_number" || ! "$patch_number" =~ ^[0-9]+$ ]]; then
@@ -54,6 +57,7 @@ jobs:
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
           echo "Nova versão gerada: $new_tag"
+
 
 
       - name: Criar nova tag
