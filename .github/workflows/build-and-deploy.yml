@@ -7,8 +7,10 @@ on:
   push:
     branches:
       - master
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["Auto Release Tag"]
+    types:
+      - completed
 
 jobs:
   build-and-push-and-deploy:
