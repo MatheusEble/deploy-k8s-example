@@ -31,6 +31,12 @@ jobs:
           minor=${parts[1]}
           patch=${parts[2]}
 
+          # Verifica se o valor de patch é numérico
+          if ! [[ "$patch" =~ ^[0-9]+$ ]]; then
+            echo "Erro: O número da versão (patch) não é válido: $patch"
+            exit 1
+          fi
+
           if [[ $patch -lt 99 ]]; then
             patch=$((patch + 1))
           else
@@ -38,9 +44,12 @@ jobs:
             minor=$((minor + 1))
           fi
 
+          patch=$(printf "%02d" "$patch")  # Garante dois dígitos no PATCH
+
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
           echo "Nova versão gerada: $new_tag"
+
 
       - name: Criar nova tag
         run: |
