@@ -47,13 +47,12 @@ jobs:
             minor=$((minor + 1))
           fi
 
-          patch=$(printf "%02d" "$patch_number")  # Garante dois dígitos no PATCH
+          # Usar printf para garantir que o patch tenha dois dígitos
+          patch=$(printf "%02d" "$patch_number")
 
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
           echo "Nova versão gerada: $new_tag"
-
-
 
       - name: Criar nova tag
         run: |
