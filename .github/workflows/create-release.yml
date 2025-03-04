@@ -31,24 +31,28 @@ jobs:
           minor=${parts[1]}
           patch=${parts[2]}
 
-          # Verifica se o valor de patch é numérico
-          if ! [[ "$patch" =~ ^[0-9]+$ ]]; then
-            echo "Erro: O número da versão (patch) não é válido: $patch"
-            exit 1
+          # Ignorar caracteres não numéricos no patch (extrair apenas a parte numérica)
+          patch_number=$(echo "$patch" | sed 's/[^0-9]*//g')
+
+          # Verifica se o valor de patch_number é numérico
+          if ! [[ "$patch_number" =~ ^[0-9]+$ ]]; then
+            patch_number=0  # Se não for numérico, tratamos como 0
           fi
 
-          if [[ $patch -lt 99 ]]; then
-            patch=$((patch + 1))
+          # Lógica de incremento
+          if [[ $patch_number -lt 99 ]]; then
+            patch_number=$((patch_number + 1))
           else
-            patch=01  # Mantém o formato correto
+            patch_number=01  # Mantém o formato correto
             minor=$((minor + 1))
           fi
 
-          patch=$(printf "%02d" "$patch")  # Garante dois dígitos no PATCH
+          patch=$(printf "%02d" "$patch_number")  # Garante dois dígitos no PATCH
 
           new_tag="$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_ENV
           echo "Nova versão gerada: $new_tag"
+
 
 
       - name: Criar nova tag
