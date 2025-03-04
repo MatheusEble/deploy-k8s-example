@@ -5,10 +5,6 @@ on:
     - cron: "5 13 * * 1-4" # 10:15 BRT (Brasil) = 13:15 UTC, de segunda a quinta
   workflow_dispatch: # Permite execução manual
 
-permissions:
-  contents: write
-  actions: write 
-
 jobs:
   create-release:
     runs-on: ubuntu-latest
