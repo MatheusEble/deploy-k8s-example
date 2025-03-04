@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-and-push-and-deploy:
-    name: Build/Push and Deploy
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
