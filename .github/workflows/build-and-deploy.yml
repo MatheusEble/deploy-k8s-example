@@ -1,12 +1,13 @@
 name: Build/Push and Deploy
 
 on:
+  release:
+    types:
+      - created  # Aciona quando uma release for criada
   pull_request:
     branches:
       - master
   push:
-    tags:
-      - '*'
     branches:
       - master
 
