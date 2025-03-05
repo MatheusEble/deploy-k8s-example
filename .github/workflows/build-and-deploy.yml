@@ -1,11 +1,16 @@
 name: Build/Push and Deploy
 
 on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Tag para deploy'
+        required: true
   push:
     branches:
       - master
-    tags:
-      - '*' 
+  release:
+    types: [published]
 
 jobs:
   build-and-push-and-deploy:
