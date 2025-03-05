@@ -73,6 +73,6 @@ jobs:
 
       - name: Acionar pipeline de deploy com a nova tag
         run: |
-          gh workflow run build-and-deploy.yml -f ref=${{ env.new_tag }}
+          gh workflow run build-and-deploy.yml -f ref=${{ env.new_tag }} -r ${{ env.new_tag }}
         env:
           GH_TOKEN: ${{ github.token }}
