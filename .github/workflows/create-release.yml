@@ -17,9 +17,10 @@ jobs:
 
       - name: Obter a última tag
         run: |
-          last_tag=$(git describe --tags --abbrev=0 || echo "0.00.00")
-          echo "Última tag encontrada: $last_tag"
-          echo "tag=$last_tag" >> $GITHUB_ENV
+          git fetch --tags
+          latest_tag=$(git tag --sort=-v:refname | head -n 1)
+          echo "Última tag encontrada: $latest_tag"
+          echo "tag=$latest_tag" >> $GITHUB_ENV
 
       - name: Calcular nova versão
         id: set_tag
