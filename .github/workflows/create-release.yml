@@ -1,0 +1,76 @@
+name: Auto Release Tag
+
+on:
+  schedule:
+    - cron: "5 13 * * 1-4" # 10:15 BRT (Brasil) = 13:15 UTC, de segunda a quinta
+  workflow_dispatch: # Permite execução manual
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Garante que pegamos todas as tags
+
+      - name: Obter a última tag
+        run: |
+          git fetch --tags
+          latest_tag=$(git tag | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || echo "0.00.00")
+          echo "Última tag encontrada: $latest_tag"
+          echo "tag=$latest_tag" >> $GITHUB_ENV
+
+      - name: Calcular nova versão
+        id: set_tag
+        run: |
+          IFS='.' read -r -a parts <<< "$tag"
+          major=${parts[0]}
+          minor=${parts[1]}
+          patch=${parts[2]}
+
+          # Remover caracteres não numéricos do patch (ex: transformar "12a" em "12")
+          patch_number=$(echo "$patch" | sed 's/[^0-9]//g')
+
+          # Remover zeros à esquerda para evitar problemas com base octal
+          patch_number=$((10#$patch_number))
+
+          # Se o patch estiver vazio ou não for numérico, definir como 0
+          if [[ -z "$patch_number" || ! "$patch_number" =~ ^[0-9]+$ ]]; then
+            patch_number=0
+          fi
+
+          # Incrementar o patch
+          if [[ $patch_number -lt 99 ]]; then
+            patch_number=$((patch_number + 1))
+          else
+            patch_number=0
+            minor=$((minor + 1))  # Incrementa o minor quando o patch chega a 99
+          fi
+
+          # Garantir que o patch tenha dois dígitos sempre
+          patch=$(printf "%02d" "$patch_number")
+
+          # Gerar a nova versão
+          new_tag="$major.$minor.$patch"
+          echo "new_tag=$new_tag" >> $GITHUB_ENV
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+          echo "Nova versão gerada: $new_tag"
+
+      - name: Criar nova tag
+        run: |
+          git tag ${{ env.new_tag }}
+          git push origin ${{ env.new_tag }}
+
+      - name: Criar release com notas automáticas
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ env.new_tag }} --title "Release ${{ env.new_tag }}" --generate-notes
+
+      - name: Acionar pipeline de deploy com a nova tag
+        run: |
+          gh workflow run build-and-deploy.yml -f ref=${{ env.new_tag }} -r ${{ env.new_tag }}
+        env:
+          GH_TOKEN: ${{ github.token }}
